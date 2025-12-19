@@ -1,0 +1,24 @@
+name: CI Qualité de Code Pro
+
+on: [push]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"] # On teste sur deux versions récentes
+    
+    steps:
+      - name: Recupere le code
+        uses: actions/checkout@v4
+
+      - name: Build de l'image
+        run: docker build --build-arg PYTHON_VER=${{ matrix.python-version }} -t image-qualite .
+
+      - name: Étape 1 : Vérification du Style (Flake8)
+        # On vérifie les erreurs de syntaxe et le respect des normes
+        run: docker run image-qualite flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Étape 2 : Tests Unitaires (Pytest)
+        run: docker run image-qualite pytest test_calcul.py
