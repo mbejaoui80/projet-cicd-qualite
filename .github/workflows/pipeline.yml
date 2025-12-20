@@ -17,7 +17,10 @@ jobs:
         run: docker build --build-arg PYTHON_VER=${{ matrix.python-version }} -t image-qualite .
 
       - name: "Etape 1 : Verification du Style (Flake8)"
-        run: docker run image-qualite flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # On enlève '--select' pour activer TOUS les contrôles de style par défaut
+        run: docker run image-qualite flake8 . --count --show-source --statistics
 
       - name: "Etape 2 : Tests Unitaires (Pytest)"
         run: docker run image-qualite pytest test_calcul.py
+
+      
